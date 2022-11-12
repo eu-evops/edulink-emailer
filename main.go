@@ -43,7 +43,7 @@ func init() {
 
 	ring := redis.NewRing(&redis.RingOptions{
 		Addrs: map[string]string{
-			os.Getenv("REDIS_HOST"): ":6379",
+			"redis": fmt.Sprintf("%s:6379", os.Getenv("REDIS_HOST")),
 		},
 		Password: os.Getenv("REDIS_PASSWORD"),
 	})
