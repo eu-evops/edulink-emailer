@@ -14,6 +14,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: docker build
-        run: docker build -t ghcr.io/${{ github.repository_owner }}/edulink:latest
+        run: docker build . -t ghcr.io/${{ github.repository_owner }}/edulink:latest
       - name: docker push
         run: docker push ghcr.io/${{ github.repository_owner }}/edulink:latest
