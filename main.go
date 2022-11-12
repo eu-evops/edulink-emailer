@@ -345,12 +345,15 @@ func main() {
 		sender := "EduLink <edulink@evops.eu>"
 		subject := fmt.Sprintf("EduLink School Report: %s", child.Forename)
 
-		// The message object allows you to add attachments and Bcc recipients
-		recipients := []string{
-			"stan@wozniak.com",
-			"eva@wozniak.com",
+		recipients := os.Getenv("EMAIL_RECIPIENTS")
+		if recipients == "" {
+			fmt.Println("No recipients specified, skipping email")
+			continue
 		}
-		message := mg.NewMessage(sender, subject, "html", recipients...)
+
+		recipientsList := strings.Split(recipients, ",")
+
+		message := mg.NewMessage(sender, subject, "html", recipientsList...)
 
 		template.New("schoolReport")
 
