@@ -45,6 +45,7 @@ func init() {
 		Addrs: map[string]string{
 			os.Getenv("REDIS_HOST"): ":6379",
 		},
+		Password: os.Getenv("REDIS_PASSWORD"),
 	})
 
 	ring.Set(context.Background(), "foo", "bar", 0)
