@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>School Report for {{ .SchoolReport.Child.Forename }}</title>
+  <style type="text/css">
+    {{ .Style }}
+  </style>
+</head>
+
+{{ define "awards-report" }}
+<div class="awardsReport">
+  {{ range .report }}
+  {{ $award := . }}
+
+  <div class="award {{ $.context }}">
+    <div class="teacherList">
+      {{ range .InvolvedEmployeeIDs }}
+      <div class="teacher">
+        <span><img class="teacherPhoto" src="data:image/png;base64,{{ teacherPhoto . }}" alt="" /></span>
+        {{ with (teacher .) }}
+
+        <span class="name">{{ .Title }} {{ .Forename }} {{ .Surname }}</span>
+        {{ if $award.LessonInformation }}
+        <span class="lesson">
+          <span>{{ $award.LessonInformation }}</span>
+        </span>
+        {{ end }}
+
+        <div class="date">
+          <span>{{ $award.Date.Format "Monday, Jan 02, 2006" }}</span>
+        </div>
+
+
+        {{ end }}
+      </div>
+      {{ end }}
+
+      {{ if and .Recorded.EmployeeID (not (has .InvolvedEmployeeIDs .Recorded.EmployeeID)) }}
+      <div class="teacher">
+        <span>Recorded by</span>
+        <span><img class="teacherPhoto" src="data:image/png;base64,{{ teacherPhoto .Recorded.EmployeeID }}"
+            alt="" /></span>
+        {{ with (teacher .Recorded.EmployeeID) }}
+        <span class="name">{{ .Title }} {{ .Forename }} {{ .Surname }}</span>
+        {{ end }}
+      </div>
+      {{ end }}
+    </div>
+
+
+
+    <div class="activityType">
+      {{ range .TypeIDs }}
+
+      {{ $activityType := "" }}
+
+      {{ if eq $.context "achievement"}}
+      {{ $activityType = activity . }}
+      {{ end }}
+
+      {{ if eq $.context "behaviour"}}
+      {{ $activityType = behaviour . }}
+      {{ end }}
+
+      <span>
+        {{ $activityType }} ({{ pluralize $award.Points "point" }})
+      </span>
+    </div>
+    {{ end }}
+
+    {{ if .Comments }}
+    <div class="comments">
+      {{ .Comments }}
+    </div>
+    {{ end }}
+
+
+  </div>
+  {{ end }}
+</div>
+{{ end }}
+
+
+<body>
+  <div id="main">
+    <div>
+      <img class="pupilPhoto" src="data:image/png;base64,{{ .SchoolReport.Photo }}" alt="">
+    </div>
+
+    <h2>Achievements</h2>
+    {{ template "awards-report" (wrap "context" "achievement" "report" .SchoolReport.Achievement) }}
+
+    <h2>Behaviour</h2>
+    {{ template "awards-report" (wrap "context" "behaviour" "report" .SchoolReport.Behaviour) }}
+
+  </div>
+</body>
+
+</html>

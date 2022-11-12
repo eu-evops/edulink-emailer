@@ -1,0 +1,15 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: docker login
+        run: echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

@@ -1,0 +1,125 @@
+body {
+  padding: 1em;
+}
+
+#main {
+  display: flex;
+  justify-content: center;
+  margin: auto;
+  flex-direction: column;
+  max-width: 500px;
+}
+
+#main>div,
+#main>h2 {
+  text-align: center;
+}
+
+#main>h2 {
+  margin-top: 1em;
+}
+
+img.pupilPhoto {
+  object-fit: cover;
+  border-radius: 114px;
+  /* width: 100%; */
+  width: 180px;
+  height: 180px;
+  border: 5px solid rgb(189, 208, 255);
+}
+
+img.teacherPhoto {
+  object-fit: cover;
+  border-radius: 114px;
+  width: 96px;
+  height: 96px;
+  border: 1px solid rgb(189, 208, 255);
+}
+
+div.award {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1em;
+
+  border-radius: 0.5em;
+  border: 1px solid rgb(223, 232, 255);
+  background: rgb(248, 250, 255);
+
+  padding: 1em;
+}
+
+div.award.achievement {
+  border: 1px solid rgb(198, 227, 190);
+  background: rgb(237, 244, 234);
+}
+
+div.award.behaviour {
+  border: 1px solid rgb(255, 223, 223);
+  background: rgb(255, 248, 248);
+}
+
+.activityType {
+  font-size: 120%;
+  margin: 0em auto;
+}
+
+.lesson {
+  font-size: 100%;
+}
+
+.teacherList {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1em;
+  margin-top: 1em;
+}
+
+.teacherList>*:last-child {
+  margin-bottom: 0;
+}
+
+.teacher {
+  margin-bottom: 1em;
+  display: flex;
+  flex-direction: column;
+}
+
+.date {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.date>span {
+  float: right;
+}
+
+.comments {
+  border: 1px solid rgb(212, 211, 211);
+  background-color: white;
+  border-radius: 0.5em;
+  color: rgb(91, 91, 91);
+  padding: 0.5em;
+  text-align: left;
+  margin-top: 1em;
+  font-size: 90%;
+}
+
+.comments::before {
+  content: 'Comments:';
+  opacity: 0.7;
+}
+
+.teacher .name {
+  font-size: 90%;
+  opacity: 0.8;
+}
+
+.lesson,
+.date {
+  opacity: .6;
+  font-size: 80%;
+}
+
+div.award>div>span:nth-child(1) {}
+
+div.award>div>span:nth-child(2) {}
