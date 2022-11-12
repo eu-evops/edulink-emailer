@@ -254,6 +254,11 @@ func main() {
 			continue
 		}
 
+		if os.Getenv("SEND_EMAIL") != "true" {
+			fmt.Println("Not sending email because SEND_EMAIL is not set to true")
+			continue
+		}
+
 		fmt.Printf("Sending email to %s\n", MAILGUN_API_KEY)
 		mg := mailgun.NewMailgun("evops.eu", MAILGUN_API_KEY)
 
@@ -336,10 +341,6 @@ func main() {
 		err = t.Execute(f, schoolReportViewData)
 		if err != nil {
 			panic(err)
-		}
-
-		if os.Getenv("SEND_EMAIL") != "true" {
-			continue
 		}
 
 		sender := "EduLink <edulink@evops.eu>"
