@@ -48,8 +48,6 @@ func init() {
 		Password: os.Getenv("REDIS_PASSWORD"),
 	})
 
-	ring.Set(context.Background(), "foo", "bar", 0)
-
 	Cache = cache.New(&cache.Options{
 		Redis:      ring,
 		LocalCache: cache.NewTinyLFU(1000, time.Minute),
