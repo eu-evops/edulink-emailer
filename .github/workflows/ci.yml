@@ -13,3 +13,7 @@ jobs:
         run: echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
         env:
           GITHUB_TOKEN: ${{ github.token }}
+      - name: docker build
+        run: docker build -t ghcr.io/${{ github.repository_owner }}/edulink:latest
+      - name: docker push
+        run: docker push ghcr.io/${{ github.repository_owner }}/edulink:latest
