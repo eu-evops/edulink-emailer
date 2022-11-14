@@ -42,13 +42,13 @@ func init() {
 	}
 
 	Cache = cache.New(&common.CacheOptions{
-		CacheType: common.Redis,
+		CacheType:     common.Redis,
+		RedisHost:     os.Getenv("REDIS_HOST"),
+		RedisUsername: os.Getenv("REDIS_USERNAME"),
+		RedisPassword: os.Getenv("REDIS_PASSWORD"),
 	})
-	redisHost := os.Getenv("REDIS_HOST")
-	redisUsername := os.Getenv("REDIS_USERNAME")
-	redisPassword := os.Getenv("REDIS_PASSWORD")
 
-	if err := Cache.Initialise(redisHost, redisUsername, redisPassword); err != nil {
+	if err := Cache.Initialise(); err != nil {
 		panic(err)
 	}
 }

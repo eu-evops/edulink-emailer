@@ -25,7 +25,7 @@ func New(options *common.CacheOptions) *Cache {
 	return c
 }
 
-func (c *Cache) Initialise(host string, username string, password string) error {
+func (c *Cache) Initialise() error {
 	log.Println("Initialising cache")
 	return c.cache.Initialise()
 }
