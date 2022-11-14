@@ -95,8 +95,7 @@ func main() {
 		},
 	}
 	var schoolDetailsResp edulink.SchoolDetailsResponse
-	err = call(schoolDetailsReq, &schoolDetailsResp)
-	if err != nil {
+	if err := call(schoolDetailsReq, &schoolDetailsResp); err != nil {
 		panic(err)
 	}
 
@@ -113,8 +112,7 @@ func main() {
 		},
 	}
 	var loginResponse edulink.LoginResponse
-	err = call(loginReq, &loginResponse)
-	if err != nil {
+	if err := call(loginReq, &loginResponse); err != nil {
 		panic(err)
 	}
 
@@ -127,8 +125,7 @@ func main() {
 		},
 	}
 	var achievementBehaviourLookupsResponse edulink.AchievementBehaviourLookupsResponse
-	err = call(achievementBehaviourLookups, &achievementBehaviourLookupsResponse)
-	if err != nil {
+	if err := call(achievementBehaviourLookups, &achievementBehaviourLookupsResponse); err != nil {
 		panic(err)
 	}
 
@@ -148,8 +145,7 @@ func main() {
 			},
 		}
 		var photoResponse edulink.LearnerPhotosResponse
-		err = call(photoReq, &photoResponse)
-		if err != nil {
+		if err := call(photoReq, &photoResponse); err != nil {
 			panic(err)
 		}
 
