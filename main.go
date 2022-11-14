@@ -59,14 +59,8 @@ func main() {
 	alreadySeenBehaviourIDs := []string{}
 	alreadySeenAchievementIDs := []string{}
 
-	err := Cache.Get(context.Background(), "alreadySeenBehaviourIDs", &alreadySeenBehaviourIDs)
-	if err != nil {
-		panic(err)
-	}
-	err = Cache.Get(context.Background(), "alreadySeenAchievementIDs", &alreadySeenAchievementIDs)
-	if err != nil {
-		panic(err)
-	}
+	Cache.Get(context.Background(), "alreadySeenBehaviourIDs", &alreadySeenBehaviourIDs)
+	Cache.Get(context.Background(), "alreadySeenAchievementIDs", &alreadySeenAchievementIDs)
 
 	fmt.Println("Already seen behaviour IDs:", alreadySeenBehaviourIDs)
 	fmt.Println("Already seen achievement IDs:", alreadySeenAchievementIDs)
