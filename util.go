@@ -6,11 +6,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"time"
 
+	"github.com/eu-evops/edulink/pkg/cache/common"
 	"github.com/eu-evops/edulink/pkg/edulink"
-	"github.com/go-redis/cache/v9"
 )
 
 type CacheableRequest struct {
@@ -19,7 +20,7 @@ type CacheableRequest struct {
 }
 
 var (
-	CACHEABLE_REQUESTS = []CacheableRequest{
+	CacheableRequests = []CacheableRequest{
 		{
 			ApiMethod: "EduLink.SchoolDetails",
 			TTL:       24 * time.Hour,
@@ -32,7 +33,7 @@ var (
 )
 
 func isCacheableRequest(apiMethod string) bool {
-	for _, cacheableRequest := range CACHEABLE_REQUESTS {
+	for _, cacheableRequest := range CacheableRequests {
 		if cacheableRequest.ApiMethod == apiMethod {
 			return true
 		}
@@ -44,13 +45,13 @@ func call(body edulink.Request, response edulink.Result) error {
 	apiMethod := body.GetBaseRequest().Method
 
 	if isCacheableRequest(apiMethod) {
-		fmt.Printf("Request cachable: '%s', checking cache\n", apiMethod)
+		log.Printf("Request cachable: '%s', checking cache\n", apiMethod)
 		if Cache.Exists(context.Background(), apiMethod) {
-			fmt.Printf("Found in cache: '%s', returning\n", apiMethod)
+			log.Printf("Found in cache: '%s', returning\n", apiMethod)
 			return Cache.Get(context.Background(), apiMethod, response)
 		}
 
-		fmt.Printf("Request not cached, calling API: '%s'\n", apiMethod)
+		log.Printf("Request not cached, calling API: '%s'\n", apiMethod)
 	}
 
 	bodyBytes, _ := json.Marshal(body)
@@ -74,15 +75,15 @@ func call(body edulink.Request, response edulink.Result) error {
 
 	if !response.GetBaseResult().Success {
 		parsedJSON, _ := json.MarshalIndent(response, "", "  ")
-		fmt.Printf("Response body: %s\n", respBody)
-		fmt.Printf("Parsed JSON: %s\n", parsedJSON)
-		fmt.Println()
+		log.Printf("Response body: %s\n", respBody)
+		log.Printf("Parsed JSON: %s\n", parsedJSON)
+		log.Println()
 		return fmt.Errorf("API call failed: %s", apiMethod)
 	}
 
 	if isCacheableRequest(apiMethod) {
-		fmt.Printf("Caching response: '%s'\n", apiMethod)
-		Cache.Set(&cache.Item{
+		log.Printf("Caching response: '%s'\n", apiMethod)
+		Cache.Set(&common.Item{
 			Ctx:   context.Background(),
 			Key:   apiMethod,
 			Value: response,

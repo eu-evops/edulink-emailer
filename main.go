@@ -11,9 +11,9 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/eu-evops/edulink/pkg/cache"
+	"github.com/eu-evops/edulink/pkg/cache/common"
 	"github.com/eu-evops/edulink/pkg/edulink"
-	"github.com/go-redis/cache/v9"
-	"github.com/go-redis/redis/v9"
 	mailgun "github.com/mailgun/mailgun-go/v4"
 	"golang.org/x/exp/slices"
 )
@@ -41,18 +41,16 @@ func init() {
 		os.Exit(1)
 	}
 
-	ring := redis.NewRing(&redis.RingOptions{
-		Addrs: map[string]string{
-			"redis": fmt.Sprintf("%s:6379", os.Getenv("REDIS_HOST")),
-		},
-		Password: os.Getenv("REDIS_PASSWORD"),
-		DB:       0,
+	Cache = cache.New(&common.CacheOptions{
+		CacheType: common.Redis,
 	})
+	redisHost := os.Getenv("REDIS_HOST")
+	redisUsername := os.Getenv("REDIS_USERNAME")
+	redisPassword := os.Getenv("REDIS_PASSWORD")
 
-	Cache = cache.New(&cache.Options{
-		Redis:      ring,
-		LocalCache: cache.NewTinyLFU(1000, time.Minute),
-	})
+	if err := Cache.Initialise(redisHost, redisUsername, redisPassword); err != nil {
+		panic(err)
+	}
 }
 
 func main() {
@@ -62,11 +60,11 @@ func main() {
 	alreadySeenAchievementIDs := []string{}
 
 	err := Cache.Get(context.Background(), "alreadySeenBehaviourIDs", &alreadySeenBehaviourIDs)
-	if err != nil && err != cache.ErrCacheMiss {
+	if err != nil {
 		panic(err)
 	}
 	err = Cache.Get(context.Background(), "alreadySeenAchievementIDs", &alreadySeenAchievementIDs)
-	if err != nil && err != cache.ErrCacheMiss {
+	if err != nil {
 		panic(err)
 	}
 
@@ -74,14 +72,14 @@ func main() {
 	fmt.Println("Already seen achievement IDs:", alreadySeenAchievementIDs)
 
 	defer (func() {
-		Cache.Set(&cache.Item{
+		Cache.Set(&common.Item{
 			Ctx:   context.Background(),
 			Key:   "alreadySeenBehaviourIDs",
 			Value: alreadySeenBehaviourIDs,
 			TTL:   0,
 		})
 
-		Cache.Set(&cache.Item{
+		Cache.Set(&common.Item{
 			Ctx:   context.Background(),
 			Key:   "alreadySeenAchievementIDs",
 			Value: alreadySeenAchievementIDs,

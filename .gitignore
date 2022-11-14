@@ -20,4 +20,4 @@
 /edulink
 *.report.html
 
-redis/
+/redis/
