@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/eu-evops/edulink/pkg/edulink"
-	"github.com/go-redis/cache/v8"
-	"github.com/go-redis/redis/v8"
+	"github.com/go-redis/cache/v9"
+	"github.com/go-redis/redis/v9"
 	mailgun "github.com/mailgun/mailgun-go/v4"
 	"golang.org/x/exp/slices"
 )
@@ -46,6 +46,7 @@ func init() {
 			"redis": fmt.Sprintf("%s:6379", os.Getenv("REDIS_HOST")),
 		},
 		Password: os.Getenv("REDIS_PASSWORD"),
+		DB:       0,
 	})
 
 	Cache = cache.New(&cache.Options{
@@ -56,6 +57,40 @@ func init() {
 
 func main() {
 	fmt.Printf("Welcome to EduLink scanner.\n")
+
+	alreadySeenBehaviourIDs := []string{}
+	alreadySeenAchievementIDs := []string{}
+
+	err := Cache.Get(context.Background(), "alreadySeenBehaviourIDs", &alreadySeenBehaviourIDs)
+	if err != nil && err != cache.ErrCacheMiss {
+		panic(err)
+	}
+	err = Cache.Get(context.Background(), "alreadySeenAchievementIDs", &alreadySeenAchievementIDs)
+	if err != nil && err != cache.ErrCacheMiss {
+		panic(err)
+	}
+
+	fmt.Println("Already seen behaviour IDs:", alreadySeenBehaviourIDs)
+	fmt.Println("Already seen achievement IDs:", alreadySeenAchievementIDs)
+
+	defer (func() {
+		Cache.Set(&cache.Item{
+			Ctx:   context.Background(),
+			Key:   "alreadySeenBehaviourIDs",
+			Value: alreadySeenBehaviourIDs,
+			TTL:   0,
+		})
+
+		Cache.Set(&cache.Item{
+			Ctx:   context.Background(),
+			Key:   "alreadySeenAchievementIDs",
+			Value: alreadySeenAchievementIDs,
+			TTL:   0,
+		})
+
+		fmt.Println("Already seen behaviour IDs:", alreadySeenBehaviourIDs)
+		fmt.Println("Already seen achievement IDs:", alreadySeenAchievementIDs)
+	})()
 
 	schoolDetailsReq := edulink.SchoolDetailsRequest{
 		RequestBase: edulink.RequestBase{
@@ -68,7 +103,7 @@ func main() {
 		},
 	}
 	var schoolDetailsResp edulink.SchoolDetailsResponse
-	err := call(schoolDetailsReq, &schoolDetailsResp)
+	err = call(schoolDetailsReq, &schoolDetailsResp)
 	if err != nil {
 		panic(err)
 	}
@@ -104,34 +139,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	alreadySeenBehaviourIDs := []string{}
-	alreadySeenAchievementIDs := []string{}
-
-	Cache.Get(context.Background(), "alreadySeenBehaviourIDs", &alreadySeenBehaviourIDs)
-	Cache.Get(context.Background(), "alreadySeenAchievementIDs", &alreadySeenAchievementIDs)
-
-	fmt.Println("Already seen behaviour IDs:", alreadySeenBehaviourIDs)
-	fmt.Println("Already seen achievement IDs:", alreadySeenAchievementIDs)
-
-	defer (func() {
-		Cache.Set(&cache.Item{
-			Ctx:   context.Background(),
-			Key:   "alreadySeenBehaviourIDs",
-			Value: alreadySeenBehaviourIDs,
-			TTL:   0,
-		})
-
-		Cache.Set(&cache.Item{
-			Ctx:   context.Background(),
-			Key:   "alreadySeenAchievementIDs",
-			Value: alreadySeenAchievementIDs,
-			TTL:   0,
-		})
-
-		fmt.Println("Already seen behaviour IDs:", alreadySeenBehaviourIDs)
-		fmt.Println("Already seen achievement IDs:", alreadySeenAchievementIDs)
-	})()
 
 	for _, child := range loginResponse.Result.Children {
 		fmt.Printf("Child: %+v\n", child)

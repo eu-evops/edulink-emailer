@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/eu-evops/edulink/pkg/edulink"
-	"github.com/go-redis/cache/v8"
+	"github.com/go-redis/cache/v9"
 )
 
 type CacheableRequest struct {
