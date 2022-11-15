@@ -1,0 +1,14 @@
+{{ define "main.layout" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {{ template "header" . }}
+</head>
+<body>
+  {{ block "content" . }}
+    <div>Default, please define</div>
+  {{ end }}
+  {{ template "footer" . }}
+</body>
+</html>
+{{ end }}

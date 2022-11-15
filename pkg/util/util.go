@@ -1,4 +1,4 @@
-package main
+package util
 
 import (
 	"bytes"
@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/eu-evops/edulink/pkg/cache"
 	"github.com/eu-evops/edulink/pkg/cache/common"
 	"github.com/eu-evops/edulink/pkg/edulink"
 )
@@ -20,6 +21,7 @@ type CacheableRequest struct {
 }
 
 var (
+	Cache             *cache.Cache
 	CacheableRequests = []CacheableRequest{
 		{
 			ApiMethod: "EduLink.SchoolDetails",
@@ -41,14 +43,14 @@ func isCacheableRequest(apiMethod string) bool {
 	return false
 }
 
-func call(body edulink.Request, response edulink.Result) error {
+func Call(ctx context.Context, body edulink.Request, response edulink.Result) error {
 	apiMethod := body.GetBaseRequest().Method
 
 	if isCacheableRequest(apiMethod) {
 		log.Printf("Request cachable: '%s', checking cache\n", apiMethod)
-		if Cache.Exists(context.Background(), apiMethod) {
+		if Cache.Exists(ctx, apiMethod) {
 			log.Printf("Found in cache: '%s', returning\n", apiMethod)
-			return Cache.Get(context.Background(), apiMethod, response)
+			return Cache.Get(ctx, apiMethod, response)
 		}
 
 		log.Printf("Request not cached, calling API: '%s'\n", apiMethod)
@@ -56,7 +58,7 @@ func call(body edulink.Request, response edulink.Result) error {
 
 	bodyBytes, _ := json.Marshal(body)
 
-	req, _ := http.NewRequest("POST", edulink.API_ENDPOINT, bytes.NewBuffer(bodyBytes))
+	req, _ := http.NewRequestWithContext(ctx, "POST", edulink.API_ENDPOINT, bytes.NewBuffer(bodyBytes))
 
 	req.Header.Set("content-type", "application/json")
 	req.Header.Set("x-api-method", apiMethod)
@@ -84,7 +86,7 @@ func call(body edulink.Request, response edulink.Result) error {
 	if isCacheableRequest(apiMethod) {
 		log.Printf("Caching response: '%s'\n", apiMethod)
 		Cache.Set(&common.Item{
-			Ctx:   context.Background(),
+			Ctx:   ctx,
 			Key:   apiMethod,
 			Value: response,
 			TTL:   24 * time.Hour,

@@ -1,4 +1,4 @@
-package main
+package mailer
 
 import "github.com/eu-evops/edulink/pkg/edulink"
 

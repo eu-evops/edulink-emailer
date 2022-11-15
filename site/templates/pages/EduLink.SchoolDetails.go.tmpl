@@ -1,0 +1,11 @@
+{{ define "title" }}
+EduLink.SchoolDetails
+{{ end }}
+
+{{ define "content" }}
+<h2>School Details</h2>
+<img src="data:image/png;base64,{{ .Result.Establishment.Logo }}" alt="School Logo" />
+{{ end }}
+
+
+{{ template "main.layout" . }}

@@ -1,0 +1,78 @@
+{{ define "title" }}
+EduLink.AchievementBehaviourLookups
+{{ end }}
+
+<h3>Achivement types</h3>
+<table>
+  {{ range .Result.AchievementTypes }}
+  <tr>
+    <td>{{ .Description }}</td>
+    <td>{{ .Points }}</td>
+  </tr>
+  {{ end }}
+</table>
+
+<h3>Behaviour types</h3>
+<table>
+  {{ range .Result.BehaviourTypes }}
+  <tr>
+    <td>{{ .Description }}</td>
+    <td>{{ .Points }}</td>
+  </tr>
+  {{ end }}
+</table>
+
+<h3>Behaviour locations</h3>
+<table>
+  {{ range .Result.BehaviourLocations }}
+  <tr>
+    <td>{{ .Name }}</td>
+  </tr>
+  {{ end }}
+</table>
+
+<h3>Behaviour Actions Taken</h3>
+<table>
+  {{ range .Result.BehaviourActionsTaken }}
+  <tr>
+    <td>{{ .Name }}</td>
+  </tr>
+  {{ end }}
+</table>
+
+<h3>Behaviour Activity Types</h3>
+<table>
+  {{ range .Result.BehaviourActivityTypes }}
+  <tr>
+    <td>{{ .Code }}</td>
+    <td>{{ .Description }}</td>
+  </tr>
+  {{ end }}
+</table>
+
+<h3>Behaviour Bullying Types</h3>
+<table>
+  {{ range .Result.BehaviourBullyingTypes }}
+  <tr>
+    <td>{{ .Name }}</td>
+  </tr>
+  {{ end }}
+</table>
+
+<h3>Behaviour Statuses</h3>
+<table>
+  {{ range .Result.BehaviourStatuses }}
+  <tr>
+    <td>{{ .Name }}</td>
+  </tr>
+  {{ end }}
+</table>
+
+<h3>Behaviour Times</h3>
+<table>
+  {{ range .Result.BehaviourTimes }}
+  <tr>
+    <td>{{ .Name }}</td>
+  </tr>
+  {{ end }}
+</table>

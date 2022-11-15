@@ -17,22 +17,30 @@ type AchievementBehaviourLookups struct {
 	}
 }
 
+type AchievementType struct {
+	ID          string `json:"id"`
+	Active      bool   `json:"active"`
+	Code        string `json:"code"`
+	Description string `json:"description"`
+	Points      int    `json:"points"`
+	Position    int    `json:"position"`
+	System      bool   `json:"system"`
+}
+
+type BehaviourType struct {
+	AchievementType
+
+	IncludeInRegister bool `json:"include_in_register"`
+	IsBullyingType    bool `json:"is_bullying_type"`
+}
+
 type AchievementBehaviourLookupsResponse struct {
 	ResponseBase
 	Result struct {
 		ResultBase
-		DetentionManagementEnabled bool `json:"detentionmanagement_enabled"`
-		BehaviourTypes             []struct {
-			Active            bool   `json:"active"`
-			ID                string `json:"id"`
-			Code              string `json:"code"`
-			Description       string `json:"description"`
-			IncludeInRegister bool   `json:"include_in_register"`
-			IsBullyingType    bool   `json:"is_bullying_type"`
-			Points            int    `json:"points"`
-			Position          int    `json:"position"`
-			System            bool   `json:"system"`
-		} `json:"behaviour_types"`
+
+		DetentionManagementEnabled bool            `json:"detentionmanagement_enabled"`
+		BehaviourTypes             []BehaviourType `json:"behaviour_types"`
 
 		BehaviourTimes []struct {
 			ID   string `json:"id"`
@@ -70,15 +78,7 @@ type AchievementBehaviourLookupsResponse struct {
 			Name string `json:"name"`
 		} `json:"behaviour_actions_taken"`
 
-		AchievementTypes []struct {
-			Active      bool   `json:"active"`
-			Code        string `json:"code"`
-			Description string `json:"description"`
-			ID          string `json:"id"`
-			Points      int    `json:"points"`
-			Position    int    `json:"position"`
-			System      bool   `json:"system"`
-		} `json:"achievement_types"`
+		AchievementTypes []AchievementType `json:"achievement_types"`
 	} `json:"result"`
 	AchivementRequireFields       []string `json:"achivement_require_fields"`
 	AchievementPointsEditable     bool     `json:"achievement_points_editable"`
