@@ -34,6 +34,7 @@ type WorkerOptions struct {
 	Cache           *cache.Cache
 	EdulinkUsername string
 	EdulinkPassword string
+	MailgunApiKey   string
 }
 
 func NewWorker(o *WorkerOptions) *Worker {
@@ -41,6 +42,7 @@ func NewWorker(o *WorkerOptions) *Worker {
 		cache:           o.Cache,
 		edulinkUsername: o.EdulinkUsername,
 		edulinkPassword: o.EdulinkPassword,
+		mailgunApiKey:   o.MailgunApiKey,
 	}
 }
 
@@ -104,6 +106,7 @@ func (w *Worker) Start() error {
 			EstablishmentID: edulink.SCHOOL_ID,
 		},
 	}
+
 	var loginResponse edulink.LoginResponse
 	if err := util.Call(context.Background(), loginReq, &loginResponse); err != nil {
 		panic(err)

@@ -63,6 +63,7 @@ func main() {
 		EdulinkUsername: EdulinkUsername,
 		EdulinkPassword: EdulinkPassword,
 		Cache:           Cache,
+		MailgunApiKey:   MailgunApiKey,
 	}
 	worker := worker.NewWorker(workerOptions)
 	if err := worker.Start(); err != nil {
