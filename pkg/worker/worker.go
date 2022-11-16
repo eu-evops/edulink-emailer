@@ -240,7 +240,7 @@ func (w *Worker) Start() error {
 			panic(err)
 		}
 
-		if len(schoolReport.Behaviour) == 0 || len(schoolReport.Achievement) == 0 {
+		if len(schoolReport.Behaviour) == 0 && len(schoolReport.Achievement) == 0 {
 			fmt.Printf("There are no new achievements or behaviours for %s to report on.\n", child.Forename)
 			continue
 		}
