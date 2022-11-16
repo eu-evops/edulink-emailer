@@ -18,11 +18,14 @@ import (
 )
 
 type Server struct {
-	mux *http.ServeMux
+	mux  *http.ServeMux
+	port int
 }
 
-func NewServer() *Server {
-	return &Server{}
+func NewServer(webserverPort int) *Server {
+	return &Server{
+		port: webserverPort,
+	}
 }
 
 func (s *Server) Start() error {
@@ -56,7 +59,7 @@ func (s *Server) Start() error {
 	s.mux.Handle("/public/", http.FileServer(http.Dir(".")))
 
 	server := &http.Server{
-		Addr:              ":8080",
+		Addr:              fmt.Sprintf(":%d", s.port),
 		Handler:           s.mux,
 		ReadHeaderTimeout: 100 * time.Millisecond,
 		WriteTimeout:      100 * time.Millisecond,

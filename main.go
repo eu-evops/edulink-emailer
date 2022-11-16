@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -51,7 +52,9 @@ func init() {
 func main() {
 	fmt.Printf("Welcome to EduLink scanner.\n")
 
-	webServer := web.NewServer()
+	webserverPort := flag.Int("port", 8080, "Port to listen on")
+
+	webServer := web.NewServer(*webserverPort)
 	if err := webServer.Start(); err != nil {
 		panic(err)
 	}

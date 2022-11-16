@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/eu-evops/edulink/pkg/cache"
 	"github.com/eu-evops/edulink/pkg/cache/common"
@@ -12,6 +13,14 @@ import (
 	"github.com/eu-evops/edulink/pkg/util"
 
 	"golang.org/x/exp/slices"
+)
+
+const (
+	Day     = 24 * time.Hour
+	Month   = 30 * Day
+	Year    = 365 * Day
+	Decade  = 10 * Year
+	Century = 10 * Decade
 )
 
 type Worker struct {
@@ -54,14 +63,14 @@ func (w *Worker) Start() error {
 			Ctx:   context.Background(),
 			Key:   "alreadySeenBehaviourIDs",
 			Value: alreadySeenBehaviourIDs,
-			TTL:   0,
+			TTL:   Century,
 		})
 
 		w.cache.Set(&common.Item{
 			Ctx:   context.Background(),
 			Key:   "alreadySeenAchievementIDs",
 			Value: alreadySeenAchievementIDs,
-			TTL:   0,
+			TTL:   Century,
 		})
 
 		fmt.Println("Already seen behaviour IDs:", alreadySeenBehaviourIDs)
