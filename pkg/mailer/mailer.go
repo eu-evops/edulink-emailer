@@ -57,7 +57,38 @@ func (m *Mailer) SetBehaviourTypes(behaviourTypes []edulink.BehaviourType) {
 	m.behaviourTypes = behaviourTypes
 }
 
-func (m *Mailer) prepareTemplates() {
+func (m *Mailer) updateTeacherPhotos(schoolReport *edulink.SchoolReport) {
+	for _, slTeacherPhoto := range schoolReport.TeacherPhotos {
+		found := false
+		for _, mTeacherPhoto := range m.teacherPhotos {
+			if mTeacherPhoto.ID == slTeacherPhoto.ID {
+				found = true
+			}
+		}
+		if !found {
+			m.teacherPhotos = append(m.teacherPhotos, slTeacherPhoto)
+		}
+	}
+}
+
+func (m *Mailer) updateTeachers(schoolReport *edulink.SchoolReport) {
+	for _, slTeacher := range schoolReport.Teachers {
+		found := false
+		for _, mTeacher := range m.teachers {
+			if mTeacher.ID == slTeacher.ID {
+				found = true
+			}
+		}
+		if !found {
+			m.teachers = append(m.teachers, slTeacher)
+		}
+	}
+}
+
+func (m *Mailer) prepareTemplates(schoolReport *edulink.SchoolReport) {
+	m.updateTeacherPhotos(schoolReport)
+	m.updateTeachers(schoolReport)
+
 	if m.templatesPrepared {
 		return
 	}
@@ -130,12 +161,16 @@ func (m *Mailer) prepareTemplates() {
 }
 
 func (m *Mailer) Send(schoolReport *edulink.SchoolReport) {
-	m.prepareTemplates()
+	m.prepareTemplates(schoolReport)
 
-	style, _ := ioutil.ReadFile("templates/style.css")
+	style, err := ioutil.ReadFile("templates/style.css")
+	if err != nil {
+		panic(err)
+	}
+
 	schoolReportViewData := &SchoolReportViewData{
 		SchoolReport: *schoolReport,
-		Style:        string(style),
+		Style:        template.CSS(style),
 	}
 
 	var tmpl bytes.Buffer

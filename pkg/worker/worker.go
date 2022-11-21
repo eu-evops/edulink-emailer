@@ -149,11 +149,13 @@ func (w *Worker) Start() error {
 		}
 
 		schoolReport := &edulink.SchoolReport{
-			Child:       child,
-			Photo:       photoResponse.Result.LearnerPhotos[0].Photo,
-			School:      schoolDetailsResp.Result.Establishment,
-			Behaviour:   []edulink.Behaviour{},
-			Achievement: []edulink.Achievement{},
+			Child:         child,
+			Photo:         photoResponse.Result.LearnerPhotos[0].Photo,
+			School:        schoolDetailsResp.Result.Establishment,
+			Behaviour:     []edulink.Behaviour{},
+			Achievement:   []edulink.Achievement{},
+			Teachers:      []edulink.Employee{},
+			TeacherPhotos: []edulink.TeacherPhoto{},
 		}
 
 		behaviourReq := edulink.BehaviourRequest{
@@ -239,6 +241,9 @@ func (w *Worker) Start() error {
 		if err := util.Call(context.Background(), teachersPhotosRequest, &teachersPhotosResponse); err != nil {
 			panic(err)
 		}
+
+		schoolReport.Teachers = involvedTeachers
+		schoolReport.TeacherPhotos = teachersPhotosResponse.Result.TeacherPhotos
 
 		if len(schoolReport.Behaviour) == 0 && len(schoolReport.Achievement) == 0 {
 			fmt.Printf("There are no new achievements or behaviours for %s to report on.\n", child.Forename)

@@ -1,8 +1,12 @@
 package mailer
 
-import "github.com/eu-evops/edulink/pkg/edulink"
+import (
+	"html/template"
+
+	"github.com/eu-evops/edulink/pkg/edulink"
+)
 
 type SchoolReportViewData struct {
 	SchoolReport edulink.SchoolReport
-	Style        string
+	Style        template.CSS
 }

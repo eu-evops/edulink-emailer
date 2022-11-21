@@ -91,11 +91,15 @@
       <img class="pupilPhoto" src="data:image/png;base64,{{ .SchoolReport.Photo }}" alt="">
     </div>
 
+    {{ if gt (len .SchoolReport.Achievement) 0 }}
     <h2>Achievements</h2>
     {{ template "awards-report" (wrap "context" "achievement" "report" .SchoolReport.Achievement) }}
+    {{ end }}
 
+    {{ if gt (len .SchoolReport.Behaviour) 0 }}
     <h2>Behaviour</h2>
     {{ template "awards-report" (wrap "context" "behaviour" "report" .SchoolReport.Behaviour) }}
+    {{ end }}
 
   </div>
 </body>

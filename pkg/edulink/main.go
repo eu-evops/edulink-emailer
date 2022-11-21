@@ -50,9 +50,11 @@ type SchoolReport struct {
 
 	Photo string `json:"photo"`
 
-	Behaviour   []Behaviour   `json:"behaviour"`
-	Achievement []Achievement `json:"achievement"`
-	School      Establishment `json:"school"`
+	Behaviour     []Behaviour    `json:"behaviour"`
+	Achievement   []Achievement  `json:"achievement"`
+	School        Establishment  `json:"school"`
+	Teachers      []Employee     `json:"teachers"`
+	TeacherPhotos []TeacherPhoto `json:"teacher_photos"`
 }
 
 type ErrNotFound struct{}
