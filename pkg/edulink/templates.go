@@ -1,12 +1,10 @@
-package mailer
+package edulink
 
 import (
 	"html/template"
-
-	"github.com/eu-evops/edulink/pkg/edulink"
 )
 
 type SchoolReportViewData struct {
-	SchoolReport edulink.SchoolReport
+	SchoolReport SchoolReport
 	Style        template.CSS
 }

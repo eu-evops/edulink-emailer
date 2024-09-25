@@ -1,18 +1,17 @@
-package util
+package edulink
 
 import (
 	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/eu-evops/edulink/pkg/cache"
 	"github.com/eu-evops/edulink/pkg/cache/common"
-	"github.com/eu-evops/edulink/pkg/edulink"
 )
 
 type CacheableRequest struct {
@@ -43,7 +42,7 @@ func isCacheableRequest(apiMethod string) bool {
 	return false
 }
 
-func Call(ctx context.Context, body edulink.Request, response edulink.Result) error {
+func Call(ctx context.Context, body Request, response Result) error {
 	apiMethod := body.GetBaseRequest().Method
 
 	if isCacheableRequest(apiMethod) {
@@ -58,7 +57,7 @@ func Call(ctx context.Context, body edulink.Request, response edulink.Result) er
 
 	bodyBytes, _ := json.Marshal(body)
 
-	req, _ := http.NewRequestWithContext(ctx, "POST", edulink.API_ENDPOINT, bytes.NewBuffer(bodyBytes))
+	req, _ := http.NewRequestWithContext(ctx, "POST", API_ENDPOINT, bytes.NewBuffer(bodyBytes))
 
 	req.Header.Set("content-type", "application/json")
 	req.Header.Set("x-api-method", apiMethod)
@@ -67,12 +66,16 @@ func Call(ctx context.Context, body edulink.Request, response edulink.Result) er
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", body.GetBaseRequest().AuthToken))
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	client := &http.Client{
+		Transport: &http.Transport{},
+		Timeout:   10 * time.Second,
+	}
+	resp, err := client.Do(req)
 	if err != nil {
 		panic(err)
 	}
 
-	respBody, _ := ioutil.ReadAll(resp.Body)
+	respBody, _ := io.ReadAll(resp.Body)
 	json.Unmarshal(respBody, response)
 
 	if !response.GetBaseResult().Success {

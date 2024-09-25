@@ -4,10 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/signal"
+	"sync"
 
 	"github.com/eu-evops/edulink/pkg/cache"
 	"github.com/eu-evops/edulink/pkg/cache/common"
-	"github.com/eu-evops/edulink/pkg/util"
+	"github.com/eu-evops/edulink/pkg/edulink"
 	"github.com/eu-evops/edulink/pkg/web"
 	"github.com/eu-evops/edulink/pkg/worker"
 )
@@ -17,7 +19,7 @@ var (
 	EdulinkPassword string
 	MailgunApiKey   string
 
-	Cache *cache.Cache
+	appCache *cache.Cache
 )
 
 func init() {
@@ -35,16 +37,16 @@ func init() {
 		os.Exit(1)
 	}
 
-	Cache = cache.New(&common.CacheOptions{
+	appCache = cache.New(&common.CacheOptions{
 		CacheType:     common.Redis,
 		RedisHost:     os.Getenv("REDIS_HOST"),
 		RedisUsername: os.Getenv("REDIS_USERNAME"),
 		RedisPassword: os.Getenv("REDIS_PASSWORD"),
 	})
 
-	util.Cache = Cache
+	edulink.Cache = appCache
 
-	if err := Cache.Initialise(); err != nil {
+	if err := appCache.Initialise(); err != nil {
 		panic(err)
 	}
 }
@@ -52,7 +54,10 @@ func init() {
 func main() {
 	fmt.Printf("Welcome to EduLink scanner.\n")
 
+	webserverEnabled := flag.Bool("webserver", false, "Enable webserver")
 	webserverPort := flag.Int("port", 8080, "Port to listen on")
+
+	flag.Parse()
 
 	webServer := web.NewServer(*webserverPort)
 	if err := webServer.Start(); err != nil {
@@ -62,12 +67,29 @@ func main() {
 	workerOptions := &worker.WorkerOptions{
 		EdulinkUsername: EdulinkUsername,
 		EdulinkPassword: EdulinkPassword,
-		Cache:           Cache,
+		Cache:           appCache,
 		MailgunApiKey:   MailgunApiKey,
 	}
+
 	worker := worker.NewWorker(workerOptions)
 	if err := worker.Start(); err != nil {
 		panic(err)
 	}
 
+	wg := sync.WaitGroup{}
+
+	if *webserverEnabled {
+		wg.Add(1)
+		fmt.Println("Webserver enabled, listening on port", *webserverPort)
+		s := make(chan os.Signal, 1)
+		signal.Notify(s, os.Interrupt)
+
+		go func() {
+			<-s
+			wg.Done()
+			webServer.Stop()
+		}()
+
+		wg.Wait()
+	}
 }

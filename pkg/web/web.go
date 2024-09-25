@@ -1,20 +1,19 @@
 package web
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
 	"io/fs"
 	"log"
+	"net"
 	"net/http"
 	"os"
-	"os/signal"
 	"path/filepath"
-	"syscall"
 	"time"
 
 	"github.com/eu-evops/edulink/pkg/edulink"
-	"github.com/eu-evops/edulink/pkg/util"
 )
 
 type Server struct {
@@ -53,29 +52,45 @@ func (s *Server) Start() error {
 
 	s.mux = http.NewServeMux()
 
+	edulinkReporter := edulink.NewReporter(&edulink.ReporterOptions{
+		Cache:    edulink.Cache,
+		Username: os.Getenv("EDULINK_USERNAME"),
+		Password: os.Getenv("EDULINK_PASSWORD"),
+	})
+
+	s.mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "text/html; charset=utf-8")
+		w.Header().Add("X-EduLink-Version", fmt.Sprintf("%T", edulinkReporter))
+
+		reports := edulinkReporter.Prepare()
+
+		w.Header().Add("X-EduLink-NumberOfReports", fmt.Sprintf("%d", len(*reports)))
+		for _, report := range *reports {
+			reportText := edulinkReporter.Generate(&report)
+			fmt.Fprintf(w, "%s", reportText)
+		}
+
+		if len(*reports) == 0 {
+			fmt.Fprintf(w, "<h1>No reports available</h1>")
+		}
+
+	}))
+
 	s.mux.Handle(makeHandler("EduLink.SchoolDetails", makeEdulinkSchoolDetailsRequest, makeEdulinkSchoolDetailsResult, templ))
 	s.mux.Handle(makeHandler("EduLink.AchievementBehaviourLookups", makeEdulinkAchievementBehaviourLookupsRequest, makeEdulinkAchievementBehaviourLookupsResult, templ))
 
 	s.mux.Handle("/public/", http.FileServer(http.Dir(".")))
 
+	serverContext, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	server := &http.Server{
 		Addr:              fmt.Sprintf(":%d", s.port),
 		Handler:           s.mux,
 		ReadHeaderTimeout: 100 * time.Millisecond,
-		WriteTimeout:      100 * time.Millisecond,
+		WriteTimeout:      2500 * time.Millisecond,
+		BaseContext:       func(listener net.Listener) context.Context { return serverContext },
 	}
 
 	go server.ListenAndServe()
-
-	defer server.Close()
-	sigc := make(chan os.Signal, 1)
-	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
-
-	go func() {
-		<-sigc
-		log.Printf("Closing the HTTP server")
-		server.Close()
-	}()
 
 	return nil
 }
@@ -145,7 +160,7 @@ func makeHandler(method string, makeRequest makeEdulinkRequest, makeResult makeE
 	h := func(w http.ResponseWriter, r *http.Request) {
 		req := makeRequest(r)
 		res := makeResult()
-		if err := util.Call(r.Context(), req, res); err != nil {
+		if err := edulink.Call(r.Context(), req, res); err != nil {
 			fmt.Fprintf(w, "Error: %s", err)
 			return
 		}

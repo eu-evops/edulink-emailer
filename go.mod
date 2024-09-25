@@ -6,7 +6,6 @@ require (
 	github.com/go-redis/cache/v9 v9.0.0-beta.1
 	github.com/go-redis/redis/v9 v9.0.0-rc.1
 	github.com/mailgun/mailgun-go/v4 v4.8.1
-	golang.org/x/exp v0.0.0-20221111204811-129d8d6c17ab
 )
 
 require (
@@ -22,4 +21,5 @@ require (
 	github.com/vmihailenco/msgpack/v5 v5.3.4 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
+	golang.org/x/sys v0.1.0 // indirect
 )

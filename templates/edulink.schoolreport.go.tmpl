@@ -41,7 +41,7 @@
 
       {{ if and .Recorded.EmployeeID (not (has .InvolvedEmployeeIDs .Recorded.EmployeeID)) }}
       <div class="teacher">
-        <span>Recorded by</span>
+        <span>Recorded on {{ .Recorded.Date }}</span>
         <span><img class="teacherPhoto" src="data:image/png;base64,{{ teacherPhoto .Recorded.EmployeeID }}"
             alt="" /></span>
         {{ with (teacher .Recorded.EmployeeID) }}
