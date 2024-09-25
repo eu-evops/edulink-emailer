@@ -52,7 +52,9 @@ func (w *Worker) Start() error {
 	schoolReports := reporter.Prepare()
 
 	for _, report := range *schoolReports {
-		mailer.Send(&report)
+		if len(report.Achievement) > 0 || len(report.Behaviour) > 0 {
+			mailer.Send(&report)
+		}
 	}
 
 	return nil
