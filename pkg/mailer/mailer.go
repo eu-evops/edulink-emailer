@@ -1,7 +1,6 @@
 package mailer
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"html/template"
@@ -17,15 +16,12 @@ import (
 type Mailer struct {
 	mailgunApiKey string
 	mailGun       *mailgun.MailgunImpl
-	template      *template.Template
 
 	teachers      []edulink.Employee
 	teacherPhotos []edulink.TeacherPhoto
 
 	behaviourTypes   []edulink.BehaviourType
 	achievementTypes []edulink.AchievementType
-
-	templatesPrepared bool
 }
 
 type MailerOptions struct {
@@ -48,22 +44,7 @@ func NewMailer(o *MailerOptions) *Mailer {
 	}
 }
 
-func (m *Mailer) Send(schoolReport *edulink.SchoolReport) {
-	style, err := os.ReadFile("templates/style.css")
-	if err != nil {
-		panic(err)
-	}
-
-	schoolReportViewData := &edulink.SchoolReportViewData{
-		SchoolReport: *schoolReport,
-		Style:        template.CSS(style),
-	}
-
-	var tmpl bytes.Buffer
-	if err := m.template.Execute(&tmpl, schoolReportViewData); err != nil {
-		panic(err)
-	}
-
+func (m *Mailer) Send(schoolReport *edulink.SchoolReport, mail string) {
 	sender := "EduLink <edulink@evops.eu>"
 	subject := fmt.Sprintf("EduLink School Report: %s", schoolReport.Child.Forename)
 
@@ -79,7 +60,7 @@ func (m *Mailer) Send(schoolReport *edulink.SchoolReport) {
 
 	template.New("schoolReport")
 
-	message.SetHtml(tmpl.String())
+	message.SetHtml(mail)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
