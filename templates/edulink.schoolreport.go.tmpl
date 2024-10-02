@@ -17,41 +17,6 @@
   {{ $award := . }}
 
   <div class="award {{ $.context }}">
-    <div class="teacherList">
-      {{ range .InvolvedEmployeeIDs }}
-      <div class="teacher">
-        <span><img class="teacherPhoto" src="data:image/png;base64,{{ teacherPhoto . }}" alt="" /></span>
-        {{ with (teacher .) }}
-
-        <span class="name">{{ .Title }} {{ .Forename }} {{ .Surname }}</span>
-        {{ if $award.LessonInformation }}
-        <span class="lesson">
-          <span>{{ $award.LessonInformation }}</span>
-        </span>
-        {{ end }}
-
-        <div class="date">
-          <span>{{ $award.Date.Format "Monday, Jan 02, 2006" }}</span>
-        </div>
-
-
-        {{ end }}
-      </div>
-      {{ end }}
-
-      {{ if and .Recorded.EmployeeID (not (has .InvolvedEmployeeIDs .Recorded.EmployeeID)) }}
-      <div class="teacher">
-        <span>Recorded on {{ .Recorded.Date }}</span>
-        <span><img class="teacherPhoto" src="data:image/png;base64,{{ teacherPhoto .Recorded.EmployeeID }}"
-            alt="" /></span>
-        {{ with (teacher .Recorded.EmployeeID) }}
-        <span class="name">{{ .Title }} {{ .Forename }} {{ .Surname }}</span>
-        {{ end }}
-      </div>
-      {{ end }}
-    </div>
-
-
 
     <div class="activityType">
       {{ range .TypeIDs }}
@@ -69,8 +34,43 @@
       <span>
         {{ $activityType }} ({{ pluralize $award.Points "point" }})
       </span>
+      {{ end }}
     </div>
+
+    <div class="date">
+      <span>{{ $award.Date.Format "Monday, Jan 02, 2006" }}</span>
+    </div>
+
+    {{ if $award.LessonInformation }}
+    <span class="lesson">
+      <span>{{ $award.LessonInformation }}</span>
+    </span>
     {{ end }}
+
+    <div class="teacherList">
+      {{ range .InvolvedEmployeeIDs }}
+      <div class="teacher">
+        <span><img class="teacherPhoto" src="data:image/png;base64,{{ teacherPhoto . }}" alt="" /></span>
+        {{ with (teacher .) }}
+
+        <span class="name">{{ .Title }} {{ .Forename }} {{ .Surname }}</span>
+
+        {{ end }}
+      </div>
+      {{ end }}
+
+      {{ if and .Recorded.EmployeeID (not (has .InvolvedEmployeeIDs .Recorded.EmployeeID)) }}
+
+      <div class="teacher">
+        <span><img class="teacherPhoto" src="data:image/png;base64,{{ teacherPhoto .Recorded.EmployeeID }}"
+            alt="" /></span>
+        {{ with (teacher .Recorded.EmployeeID) }}
+        <span class="name">{{ .Title }} {{ .Forename }} {{ .Surname }}</span>
+        {{ end }}
+      </div>
+      {{ end }}
+    </div>
+
 
     {{ if .Comments }}
     <div class="comments">

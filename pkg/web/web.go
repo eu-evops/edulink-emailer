@@ -62,7 +62,10 @@ func (s *Server) Start() error {
 		w.Header().Add("Content-Type", "text/html; charset=utf-8")
 		w.Header().Add("X-EduLink-Version", fmt.Sprintf("%T", edulinkReporter))
 
-		reports := edulinkReporter.Prepare()
+		reports := edulinkReporter.Prepare(&edulink.PrepareOptions{
+			MaximumAge:     edulink.Month,
+			ReportPrevious: true,
+		})
 
 		w.Header().Add("X-EduLink-NumberOfReports", fmt.Sprintf("%d", len(*reports)))
 		for _, report := range *reports {

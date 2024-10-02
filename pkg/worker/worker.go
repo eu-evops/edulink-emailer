@@ -49,7 +49,7 @@ func (w *Worker) Start() error {
 		Cache:    w.cache,
 	})
 
-	schoolReports := reporter.Prepare()
+	schoolReports := reporter.Prepare(nil)
 
 	for _, report := range *schoolReports {
 		if len(report.Achievement) > 0 || len(report.Behaviour) > 0 {

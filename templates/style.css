@@ -1,5 +1,7 @@
 body {
   padding: 1em;
+  font-family: 'Arial', sans-serif;
+  color: #222
 }
 
 #main {
@@ -65,6 +67,7 @@ div.award.behaviour {
 
 .lesson {
   font-size: 100%;
+  margin-top: 0.5em;
 }
 
 .teacherList {
@@ -86,6 +89,7 @@ div.award.behaviour {
 
 .date {
   display: flex;
+  margin-top: 0.5em;
   flex-direction: column-reverse;
 }
 
@@ -102,11 +106,9 @@ div.award.behaviour {
   text-align: left;
   margin-top: 1em;
   font-size: 90%;
-}
-
-.comments::before {
-  content: 'Comments:';
-  opacity: 0.7;
+  font-style: italic;
+  opacity: 0.6;
+  text-align: center;
 }
 
 .teacher .name {

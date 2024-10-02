@@ -33,8 +33,6 @@ type Reporter struct {
 
 	templatesPrepared bool
 	template          *template.Template
-
-	cache *cache.Cache
 }
 
 type ReporterOptions struct {
@@ -113,9 +111,9 @@ func (r *Reporter) prepareTemplates(schoolReport *SchoolReport) {
 		},
 		"pluralize": func(val int, text string) string {
 			if val == 1 {
-				return fmt.Sprintf("%d %s", val, text)
+				return fmt.Sprintf("%d %s", val, text)
 			}
-			return fmt.Sprintf("%d %ss", val, text)
+			return fmt.Sprintf("%d %ss", val, text)
 		},
 		"teacher": func(teacherID string) *Employee {
 			for _, employee := range r.teachers {
@@ -164,7 +162,20 @@ func (r *Reporter) prepareTemplates(schoolReport *SchoolReport) {
 	r.templatesPrepared = true
 }
 
-func (r *Reporter) Prepare() *[]SchoolReport {
+type PrepareOptions struct {
+	// MaximumAge is the maximum age of behaviours and achievements to report on
+	MaximumAge time.Duration
+
+	// ReportPrevious will report on previously seen behaviours and achievements
+	ReportPrevious bool
+}
+
+func (r *Reporter) Prepare(options *PrepareOptions) *[]SchoolReport {
+	if options == nil {
+		options = &PrepareOptions{
+			MaximumAge: Year,
+		}
+	}
 
 	schoolReports := []SchoolReport{}
 	alreadySeenBehaviourIDs := []string{}
@@ -294,7 +305,12 @@ func (r *Reporter) Prepare() *[]SchoolReport {
 		}
 
 		for _, behaviour := range behaviourResponse.Result.Behaviour {
-			if !slices.Contains(alreadySeenBehaviourIDs, behaviour.ID) {
+			if time.Time(behaviour.Date).Add(options.MaximumAge).Before(time.Now()) {
+				fmt.Printf("Behaviour %s is too old to report on\n", behaviour.ID)
+				continue
+			}
+
+			if options.ReportPrevious || !slices.Contains(alreadySeenBehaviourIDs, behaviour.ID) {
 				schoolReport.Behaviour = append(schoolReport.Behaviour, behaviour)
 				alreadySeenBehaviourIDs = append(alreadySeenBehaviourIDs, behaviour.ID)
 			}
@@ -319,7 +335,14 @@ func (r *Reporter) Prepare() *[]SchoolReport {
 		}
 
 		for _, achievement := range achievementResponse.Result.Achievement {
-			if !slices.Contains(alreadySeenAchievementIDs, achievement.ID) {
+			if time.Time(achievement.Date).Add(options.MaximumAge).Before(time.Now()) {
+				fmt.Printf("Achievement %s is too old to report on\n", achievement.ID)
+				continue
+			} else {
+				fmt.Printf("Achievement %s is not too old to report on\n", achievement.ID)
+			}
+
+			if options.ReportPrevious || !slices.Contains(alreadySeenAchievementIDs, achievement.ID) {
 				schoolReport.Achievement = append(schoolReport.Achievement, achievement)
 				alreadySeenAchievementIDs = append(alreadySeenAchievementIDs, achievement.ID)
 			}
